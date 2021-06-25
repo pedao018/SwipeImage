@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="square_shape_dimen">3dp</dimen>
+    <dimen name="image_list_item_margin">5dp</dimen>
+    <dimen name="image_list_item_height">100dp</dimen>
+    <dimen name="view_image_dialog_review_list_item_width">100dp</dimen>
+    <dimen name="view_image_dialog_review_list_item_margin">2dp</dimen>
+</resources>

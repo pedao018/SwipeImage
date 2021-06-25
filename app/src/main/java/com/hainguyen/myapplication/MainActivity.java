@@ -1,64 +1,79 @@
 package com.hainguyen.myapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.util.Log;
 
-import com.hainguyen.myapplication.adapter.WebAdapter;
-import com.hainguyen.myapplication.ui.SwipeDetectModel;
+import com.hainguyen.myapplication.adapter.ImageListAdapter;
+import com.hainguyen.myapplication.adapter.ReviewImageAdapter;
+import com.hainguyen.myapplication.model.ImageItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ImageListAdapter.OnImageListListener, ReviewImageAdapter.OnReviewImageListener {
 
-    public RecyclerView webViewRecyclerView;
+    private RecyclerView imageListRecyclerView;
+    private ImageListAdapter imageListAdapter;
+    List<ImageItem> imageList;
+    ListImageDialog imageDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        webViewRecyclerView = (RecyclerView) findViewById(R.id.webview_recycleview);
+        imageListRecyclerView = (RecyclerView) findViewById(R.id.image_list_recycleview);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 3);
-        webViewRecyclerView.setLayoutManager(layoutManager);
-        webViewRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        webViewRecyclerView.setFocusable(false);
+        imageListRecyclerView.setLayoutManager(layoutManager);
+        imageListRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        imageListRecyclerView.setFocusable(false);
 
-        List<WebItem> list = new ArrayList<>();
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("DKN News", "https://i.pinimg.com/564x/52/82/ea/5282ea1d4ede83b5f8f2f842073b476a.jpg");
-        map.put("DKN News 2", "https://i.pinimg.com/564x/f8/26/63/f82663c95ccde80628e34594c09a5540.jpg");
-        map.put("DKN News 3", "https://i.pinimg.com/564x/42/7a/1e/427a1e601c0b01751a58f0a718b38782.jpg");
-        map.put("Cat", "https://i.pinimg.com/564x/28/2d/7f/282d7f92b7c162a21afd5002383a3eff.jpg");
-        map.put("Cat 2", "https://i.pinimg.com/564x/e9/db/ac/e9dbac19f668cd8f44ac50abf2879f85.jpg");
-        map.put("Cat 3", "https://i.pinimg.com/564x/73/3d/7e/733d7e1f12eed7c4527ef836954a5aa6.jpg");
-        map.put("City", "https://i.pinimg.com/564x/8d/4f/e7/8d4fe7d83b1781c1ec979d2bb0767e8d.jpg");
-        map.put("City 2", "https://i.pinimg.com/564x/72/9c/db/729cdb982d6cd58dacc7009f33057770.jpg");
-        map.put("Galaxy ", "https://i.pinimg.com/564x/cb/cb/12/cbcb122c1bdd2e1ab2f986a03277e5a4.jpg");
-        map.put("Galaxy 2", "https://i.pinimg.com/564x/13/fe/df/13fedf366e39e51f91962d9f8ac075e5.jpg");
-        map.put("Galaxy 3", "https://i.pinimg.com/564x/13/fe/df/13fedf366e39e51f91962d9f8ac075e5.jpg");
-        map.put("Galaxy 4", "https://i.pinimg.com/564x/13/fe/df/13fedf366e39e51f91962d9f8ac075e5.jpg");
-        map.put("Galaxy 5", "https://i.pinimg.com/564x/13/fe/df/13fedf366e39e51f91962d9f8ac075e5.jpg");
-        map.put("Galaxy 6", "https://i.pinimg.com/564x/13/fe/df/13fedf366e39e51f91962d9f8ac075e5.jpg");
-        map.put("Galaxy 7", "https://i.pinimg.com/564x/13/fe/df/13fedf366e39e51f91962d9f8ac075e5.jpg");
-        //Elements can traverse in any order
-        for (Map.Entry m : map.entrySet()) {
-            list.add(new WebItem(m.getKey().toString(), m.getValue().toString()));
-        }
-        setAdapterJobType(list);
+        imageList = new ArrayList<>();
+        imageList.add(new ImageItem("Ảnh 1", "https://i.pinimg.com/564x/7b/55/d3/7b55d36efc468c573da95d90ef5764b9.jpg"));
+        imageList.add(new ImageItem("Ảnh 2", "https://i.pinimg.com/564x/d2/1f/cc/d21fcc66de988ed964930394a6fa2b26.jpg"));
+        imageList.add(new ImageItem("Ảnh 3", "https://i.pinimg.com/564x/7a/58/d9/7a58d9b1d453816941ffb99ad55edf7a.jpg"));
+        imageList.add(new ImageItem("Ảnh 4", "https://i.pinimg.com/564x/64/df/3a/64df3aee6ea76d6dd1fea8bbe535988b.jpg"));
+        imageList.add(new ImageItem("Ảnh 5", "https://i.pinimg.com/564x/32/f4/1c/32f41cc05b17e3d52a65fdaadf575e88.jpg"));
+        imageList.add(new ImageItem("Ảnh 6", "https://i.pinimg.com/564x/f0/4b/7f/f04b7fd585d1e5638fb5e6664446ee3f.jpg"));
+        imageList.add(new ImageItem("Ảnh 7", "https://i.pinimg.com/564x/4e/a9/1f/4ea91f60e439dd94c37df106c6682a5f.jpg"));
+        imageList.add(new ImageItem("Ảnh 8", "https://i.pinimg.com/564x/2b/0e/ae/2b0eae86b82173d8fb74820377016757.jpg"));
+        imageList.add(new ImageItem("Ảnh 9", "https://i.pinimg.com/564x/90/07/95/900795e4b413f8b019e3570288df0dc6.jpg"));
+        imageList.add(new ImageItem("Ảnh 10", "https://i.pinimg.com/564x/b7/ba/56/b7ba569d599dcd462e093d2b799e8333.jpg"));
+        imageList.add(new ImageItem("Ảnh 11", "https://i.pinimg.com/564x/cf/fa/83/cffa83ebe67a00b3dfead14ce35060e9.jpg"));
+        imageList.add(new ImageItem("Ảnh 12", "https://i.pinimg.com/564x/c3/61/8f/c3618f3846dae71a3653d9c5ff70a25e.jpg"));
+        imageList.add(new ImageItem("Ảnh 13", "https://i.pinimg.com/564x/99/de/52/99de52e1612dfd4be0eacdc83fe1d8ad.jpg"));
+        imageList.add(new ImageItem("Ảnh 14", "https://i.pinimg.com/564x/aa/10/f0/aa10f082b3938e8909ae737e851d5217.jpg"));
+        imageList.add(new ImageItem("Ảnh 15", "https://i.pinimg.com/564x/f6/fa/58/f6fa58490961b62ebc0a3b422c6a4312.jpg"));
+        imageList.add(new ImageItem("Ảnh 16", "https://i.pinimg.com/564x/06/fd/e4/06fde4241f713ac2b8a462017896a277.jpg"));
+        imageList.add(new ImageItem("Ảnh 17", "https://i.pinimg.com/564x/67/37/4a/67374a38f93b461811a207e94ddabbcb.jpg"));
+        imageList.add(new ImageItem("Ảnh 18", "https://i.pinimg.com/564x/3a/01/d5/3a01d5aa61dda90816ca150e90874769.jpg"));
+        imageList.add(new ImageItem("Ảnh 19", "https://i.pinimg.com/564x/6d/b8/b1/6db8b110c64b93f769f977b5fcad7f62.jpg"));
+        imageList.add(new ImageItem("Ảnh 20", "https://i.pinimg.com/564x/29/62/81/2962810a29877d0754c95a06e3effbeb.jpg"));
+        imageList.add(new ImageItem("Ảnh 21", "https://i.pinimg.com/564x/4e/cc/bc/4eccbc159e997d552088f1853440ba23.jpg"));
+        imageList.add(new ImageItem("Ảnh 22", "https://i.pinimg.com/564x/63/78/79/637879031c18ab781919aabcb743020f.jpg"));
 
-
+        imageListAdapter = new ImageListAdapter(imageList, this);
+        imageListRecyclerView.setAdapter(imageListAdapter);
     }
 
-    public void setAdapterJobType(List<WebItem> list) {
-        WebAdapter webAdapter = new WebAdapter(list, this);
-        webViewRecyclerView.setAdapter(webAdapter);
+    @Override
+    public void onImageListClickListener(@NonNull Context context, List<ImageItem> dataSet, int currentPosition) {
+        this.imageDialog = new ListImageDialog(context, dataSet, currentPosition);
+        this.imageDialog.show();
+    }
+
+    @Override
+    public void onReviewImageClickListener(int position) {
+        this.imageDialog.setCurrentItemViewPager(position);
     }
 }
