@@ -1,6 +1,7 @@
 package com.hainguyen.myapplication;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -8,10 +9,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.View;
 
 import com.hainguyen.myapplication.adapter.ImageListAdapter;
 import com.hainguyen.myapplication.adapter.ReviewImageAdapter;
+import com.hainguyen.myapplication.adapter.ViewPagerAdapter;
 import com.hainguyen.myapplication.model.ImageItem;
 
 import java.util.ArrayList;
@@ -20,12 +25,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MainActivity extends AppCompatActivity implements ImageListAdapter.OnImageListListener, ReviewImageAdapter.OnReviewImageListener {
+public class MainActivity extends AppCompatActivity implements ImageListAdapter.OnImageListListener, ReviewImageAdapter.OnReviewImageListener, ViewPagerAdapter.ViewHolder.OnViewPagerSwipeListener {
 
     private RecyclerView imageListRecyclerView;
     private ImageListAdapter imageListAdapter;
     List<ImageItem> imageList;
     ListImageDialog imageDialog;
+
+    private static String IMAGE_DIALOG_CURRENT_SELECTED_IMAGE = "IMAGE_DIALOG_CURRENT_SELECTED_IMAGE";
+    private static String IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW = "IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,13 +75,56 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (imageDialog != null)
+            imageDialog.dismiss();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (imageDialog != null) {
+            //Lưu vị trí item được chọn (Chọn do người dùng), dùng cho xoay màn hình lưu giữ data lại
+            outState.putInt(IMAGE_DIALOG_CURRENT_SELECTED_IMAGE, imageDialog.mViewImageViewPager.getCurrentItem());
+            outState.putBoolean(IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW, imageDialog.isHideContainerTextView);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@Nullable Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.get(IMAGE_DIALOG_CURRENT_SELECTED_IMAGE) != null) {
+            int currentPosition = savedInstanceState.getInt(IMAGE_DIALOG_CURRENT_SELECTED_IMAGE);
+            boolean isHideContainerTextView = false;
+            if (savedInstanceState.get(IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW) != null)
+                isHideContainerTextView = savedInstanceState.getBoolean(IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW);
+            showDialog(this, imageList, currentPosition, isHideContainerTextView);
+
+        }
+
+    }
+
+    @Override
     public void onImageListClickListener(@NonNull Context context, List<ImageItem> dataSet, int currentPosition) {
-        this.imageDialog = new ListImageDialog(context, dataSet, currentPosition);
-        this.imageDialog.show();
+        showDialog(context, dataSet, currentPosition, false);
     }
 
     @Override
     public void onReviewImageClickListener(int position) {
         this.imageDialog.setCurrentItemViewPager(position);
+    }
+
+    private void showDialog(@NonNull Context context, List<ImageItem> dataSet, int currentPosition, boolean isHideContainerTextView) {
+        this.imageDialog = new ListImageDialog(context, dataSet, currentPosition);
+        imageDialog.hideImgBtnBack(isHideContainerTextView);
+        this.imageDialog.show();
+    }
+
+    @Override
+    public void onViewPagerSwipeListener(boolean isHideContainerTextView) {
+        if (imageDialog != null) {
+            imageDialog.hideImgBtnBack(isHideContainerTextView);
+        }
     }
 }

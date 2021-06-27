@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/image_list_item_margin"
+    android:background="#E2E4A8"
     android:orientation="vertical">
 
 
@@ -16,5 +17,8 @@
     <TextView
         android:id="@+id/image_list_item_textview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
 </LinearLayout>

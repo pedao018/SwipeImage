@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -22,12 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListImageDialog extends Dialog {
-    private ViewPagerLayout mViewImageViewPager;
+    protected ViewPagerLayout mViewImageViewPager;
     private ViewPagerAdapter mViewImageViewPagerAdapter;
-    public RecyclerView mReviewImageListRecycleView;
+    private RecyclerView mReviewImageListRecycleView;
     private ReviewImageAdapter mReviewImageListAdapter;
+    private ImageButton mImgBtnBack;
     private List<ImageItem> mReviewImageList;
-    private int prevHighlightItem; //Dùng để xác định item được chọn trước đó trong mReviewImageList
+    private int prevHighlightItem; //Dùng để xác định item được chọn trước đó trong mReviewImageList, dùng để xóa màu selected
+    public boolean isHideContainerTextView = false;
 
     private Context context;
 
@@ -46,7 +50,10 @@ public class ListImageDialog extends Dialog {
         prevHighlightItem = currentPosition;
 
         mViewImageViewPager = (ViewPagerLayout) findViewById(R.id.view_image_dialog_viewpager);
+        mReviewImageListRecycleView = (RecyclerView) findViewById(R.id.view_image_dialog_review_list);
         mViewImageViewPagerAdapter = new ViewPagerAdapter(this.context, this.mReviewImageList);
+        mImgBtnBack = (ImageButton) findViewById(R.id.view_image_dialog_imgbtn_back);
+
         mViewImageViewPager.setAdapter(mViewImageViewPagerAdapter);
         mViewImageViewPager.setCurrentItem(currentPosition);
         mViewImageViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -66,7 +73,6 @@ public class ListImageDialog extends Dialog {
             }
         });
 
-        mReviewImageListRecycleView = (RecyclerView) findViewById(R.id.view_image_dialog_review_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.context, LinearLayoutManager.HORIZONTAL, false);
         mReviewImageListRecycleView.setLayoutManager(layoutManager);
         mReviewImageListRecycleView.setItemAnimator(new DefaultItemAnimator());
@@ -79,6 +85,10 @@ public class ListImageDialog extends Dialog {
         mReviewImageListRecycleView.postDelayed(() -> {
             mReviewImageListRecycleView.scrollToPosition(currentPosition);
         }, 200);
+
+        mImgBtnBack.setOnClickListener(view -> {
+            this.dismiss();
+        });
     }
 
     public void setCurrentItemViewPager(int currentPosition) {
@@ -103,5 +113,16 @@ public class ListImageDialog extends Dialog {
             tempList.get(position + 1).isSelected = false;
         mReviewImageListAdapter.setData(tempList);
         prevHighlightItem = position;
+    }
+
+    protected void hideImgBtnBack(boolean isHideContainerTextView) {
+        this.isHideContainerTextView = isHideContainerTextView;
+        if (isHideContainerTextView) {
+            this.mImgBtnBack.setVisibility(View.GONE);
+            this.mReviewImageListRecycleView.setVisibility(View.GONE);
+        } else {
+            this.mImgBtnBack.setVisibility(View.VISIBLE);
+            this.mReviewImageListRecycleView.setVisibility(View.VISIBLE);
+        }
     }
 }
