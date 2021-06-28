@@ -32,7 +32,7 @@ public class ListImageDialog extends Dialog {
     private List<ImageItem> mReviewImageList;
     private int prevHighlightItem; //Dùng để xác định item được chọn trước đó trong mReviewImageList, dùng để xóa màu selected
     public boolean isHideContainerTextView = false;
-
+    private OnCloseDialog onCloseDialog;
     private Context context;
 
     public ListImageDialog(@NonNull Context context, List<ImageItem> dataSet, int currentPosition) {
@@ -48,6 +48,7 @@ public class ListImageDialog extends Dialog {
         dataSet.get(currentPosition).isSelected = true;
         this.mReviewImageList = dataSet;
         prevHighlightItem = currentPosition;
+        onCloseDialog = (OnCloseDialog) context;
 
         mViewImageViewPager = (ViewPagerLayout) findViewById(R.id.view_image_dialog_viewpager);
         mReviewImageListRecycleView = (RecyclerView) findViewById(R.id.view_image_dialog_review_list);
@@ -88,7 +89,14 @@ public class ListImageDialog extends Dialog {
 
         mImgBtnBack.setOnClickListener(view -> {
             this.dismiss();
+            onCloseDialog.onCloseDialog();
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        onCloseDialog.onCloseDialog();
     }
 
     public void setCurrentItemViewPager(int currentPosition) {
@@ -124,5 +132,9 @@ public class ListImageDialog extends Dialog {
             this.mImgBtnBack.setVisibility(View.VISIBLE);
             this.mReviewImageListRecycleView.setVisibility(View.VISIBLE);
         }
+    }
+
+    interface OnCloseDialog {
+        void onCloseDialog();
     }
 }

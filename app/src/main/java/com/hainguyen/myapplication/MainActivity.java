@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.hainguyen.myapplication.adapter.ImageListAdapter;
 import com.hainguyen.myapplication.adapter.ReviewImageAdapter;
@@ -25,10 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MainActivity extends AppCompatActivity implements ImageListAdapter.OnImageListListener, ReviewImageAdapter.OnReviewImageListener, ViewPagerAdapter.ViewHolder.OnViewPagerSwipeListener {
+public class MainActivity extends AppCompatActivity implements ImageListAdapter.OnImageListListener, ReviewImageAdapter.OnReviewImageListener, ViewPagerAdapter.ViewHolder.OnViewPagerSwipeListener, ListImageDialog.OnCloseDialog {
 
     private RecyclerView imageListRecyclerView;
     private ImageListAdapter imageListAdapter;
+    private LinearLayout emptyContainer;
     List<ImageItem> imageList;
     ListImageDialog imageDialog;
 
@@ -40,8 +42,9 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        emptyContainer = (LinearLayout) findViewById(R.id.image_list_empty_container);
         imageListRecyclerView = (RecyclerView) findViewById(R.id.image_list_recycleview);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 3);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         imageListRecyclerView.setLayoutManager(layoutManager);
         imageListRecyclerView.setItemAnimator(new DefaultItemAnimator());
         imageListRecyclerView.setFocusable(false);
@@ -70,15 +73,22 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         imageList.add(new ImageItem("Ảnh 21", "https://i.pinimg.com/564x/4e/cc/bc/4eccbc159e997d552088f1853440ba23.jpg"));
         imageList.add(new ImageItem("Ảnh 22", "https://i.pinimg.com/564x/63/78/79/637879031c18ab781919aabcb743020f.jpg"));
 
-        imageListAdapter = new ImageListAdapter(imageList, this);
-        imageListRecyclerView.setAdapter(imageListAdapter);
+        if (imageList.size() != 0) {
+            imageListAdapter = new ImageListAdapter(imageList, this);
+            imageListRecyclerView.setAdapter(imageListAdapter);
+            emptyContainer.setVisibility(View.GONE);
+        } else {
+            emptyContainer.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (imageDialog != null)
+        if (imageDialog != null) {
             imageDialog.dismiss();
+        }
     }
 
     @Override
@@ -100,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             if (savedInstanceState.get(IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW) != null)
                 isHideContainerTextView = savedInstanceState.getBoolean(IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW);
             showDialog(this, imageList, currentPosition, isHideContainerTextView);
-
+            savedInstanceState.clear();
         }
 
     }
@@ -126,5 +136,10 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         if (imageDialog != null) {
             imageDialog.hideImgBtnBack(isHideContainerTextView);
         }
+    }
+
+    @Override
+    public void onCloseDialog() {
+        imageDialog = null;
     }
 }
