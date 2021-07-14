@@ -141,5 +141,6 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     @Override
     public void onCloseDialog() {
         imageDialog = null;
+        ViewPagerAdapter.ViewHolder.isHideContainerTextView = false;
     }
 }

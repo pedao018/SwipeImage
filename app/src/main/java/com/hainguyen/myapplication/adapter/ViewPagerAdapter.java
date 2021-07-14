@@ -85,7 +85,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         TextView textView;
         LinearLayout containerTextView;
         ImageItem imageItem;
-        static boolean isHideContainerTextView = false;
+        public static boolean isHideContainerTextView = false;
         static int listSize = 0;
         private OnViewPagerSwipeListener onViewPagerSwipeListener;
 
