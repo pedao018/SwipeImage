@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.hainguyen.myapplication.ListImageDialog;
 import com.hainguyen.myapplication.R;
 import com.hainguyen.myapplication.model.ImageItem;
@@ -42,7 +45,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Data
     public void onBindViewHolder(@NonNull ImageListAdapter.DataViewHolder dataViewHolder, int position) {
         ImageItem item = dataSet.get(position);
         dataViewHolder.textView.setText(item.name);
-        Glide.with(context).load(item.url).into(dataViewHolder.imageView);
+        Glide.with(context).load(item.url).placeholder(R.drawable.loading_animation).into(dataViewHolder.imageView);
         dataViewHolder.container.setOnClickListener(view -> {
             onImageListListener.onImageListClickListener(context, dataSet, position);
         });
