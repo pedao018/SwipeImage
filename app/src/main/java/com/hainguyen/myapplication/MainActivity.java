@@ -9,11 +9,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.hainguyen.myapplication.adapter.ImageListAdapter;
 import com.hainguyen.myapplication.adapter.ReviewImageAdapter;
@@ -21,10 +23,7 @@ import com.hainguyen.myapplication.adapter.ViewPagerAdapter;
 import com.hainguyen.myapplication.model.ImageItem;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity implements ImageListAdapter.OnImageListListener, ReviewImageAdapter.OnReviewImageListener, ViewPagerAdapter.ViewHolder.OnViewPagerSwipeListener, ListImageDialog.OnCloseDialog {
 
@@ -33,6 +32,18 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     private LinearLayout emptyContainer;
     List<ImageItem> imageList;
     ListImageDialog imageDialog;
+
+    //Cho collapseContainer
+    private FrameLayout collapseContainer;
+    private ImageView collapseMoveTestImg;
+    private float yDownCollapseContainer = 0f;
+    private float collapseContainer_MaxWeight;
+    private final float collapseContainer_MinWeight = 0.25f;
+
+    //Cho movingTextView
+    private TextView movingTextView;
+    private float xDownMovingTextView = 0f;
+    private float yDownMovingTextView = 0f;
 
     private static String IMAGE_DIALOG_CURRENT_SELECTED_IMAGE = "IMAGE_DIALOG_CURRENT_SELECTED_IMAGE";
     private static String IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW = "IMAGE_DIALOG_IS_HIDE_CONTAINER_TEXTVIEW";
@@ -81,6 +92,63 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             emptyContainer.setVisibility(View.VISIBLE);
         }
 
+        //Collapse Container
+        collapseContainer = (FrameLayout) findViewById(R.id.collapse_move_test_container);
+        collapseMoveTestImg = (ImageView) findViewById(R.id.collapse_move_test_img);
+
+        collapseContainer_MaxWeight = ((LinearLayout.LayoutParams) collapseContainer.getLayoutParams()).weight; //lấy từ weight xml
+
+        collapseMoveTestImg.setOnTouchListener((view1, motionEvent) -> {
+            switch (motionEvent.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    yDownCollapseContainer = motionEvent.getY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float movedY = motionEvent.getY();
+                    float distanceY = movedY - yDownCollapseContainer;
+                    if (distanceY != 0) {
+                        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) collapseContainer.getLayoutParams();
+                        float containerCad_height = collapseContainer.getBottom() - collapseContainer.getTop();
+                        float height_after_move = containerCad_height - distanceY;
+                        float new_weight = (height_after_move * params.weight) / containerCad_height;
+                        if (new_weight >= collapseContainer_MinWeight && new_weight <= collapseContainer_MaxWeight) {
+                            if (!((Math.floor(params.weight) == collapseContainer_MinWeight
+                                    || Math.floor(params.weight) == collapseContainer_MaxWeight)
+                                    && (Math.floor(new_weight) == collapseContainer_MinWeight
+                                    || Math.floor(new_weight) == collapseContainer_MaxWeight))) {
+                                params.weight = new_weight;
+                                collapseContainer.setLayoutParams(params);
+                                return true;
+                            }
+                        }
+                    }
+                    break;
+            }
+            return true;
+        });
+
+        movingTextView = (TextView) findViewById(R.id.collapse_move_test_moving_text);
+        movingTextView.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    xDownMovingTextView = event.getX();
+                    yDownMovingTextView = event.getY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float movedX = event.getX();
+                    float movedY = event.getY();
+
+                    //calcualate how much the user moved his finger
+                    float distanceX = movedX - xDownMovingTextView;
+                    float distanceY = movedY - yDownMovingTextView;
+
+                    //now move the view to that position
+                    movingTextView.setX(movingTextView.getX() + distanceX);
+                    movingTextView.setY(movingTextView.getY() + distanceY);
+                    break;
+            }
+            return true;
+        });
     }
 
     @Override
