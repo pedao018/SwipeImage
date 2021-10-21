@@ -1,6 +1,8 @@
 package com.hainguyen.myapplication.adapter;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +19,21 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.hainguyen.myapplication.ListImageDialog;
 import com.hainguyen.myapplication.R;
+import com.hainguyen.myapplication.model.DownloadImageTask;
+import com.hainguyen.myapplication.model.DownloadImageTask_2;
 import com.hainguyen.myapplication.model.ImageItem;
 
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.DataViewHolder> {
 
@@ -45,7 +59,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Data
     public void onBindViewHolder(@NonNull ImageListAdapter.DataViewHolder dataViewHolder, int position) {
         ImageItem item = dataSet.get(position);
         dataViewHolder.textView.setText(item.name);
-        Glide.with(context).load(item.url).placeholder(R.drawable.loading_animation).into(dataViewHolder.imageView);
+        if (item.url.equals("https://pda01.esales.vn/Vedan_IMG/B2NPPDTH01_B2SM180621.jpg")) {
+            //new DownloadImageTask(dataViewHolder.imageView).execute(item.url);
+            new DownloadImageTask_2(context, dataViewHolder.imageView).execute(item.url);
+        } else
+            Glide.with(context).load(item.url).placeholder(R.drawable.loading_animation).into(dataViewHolder.imageView);
         dataViewHolder.container.setOnClickListener(view -> {
             onImageListListener.onImageListClickListener(context, dataSet, position);
         });

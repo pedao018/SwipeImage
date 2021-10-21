@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         imageListRecyclerView.setFocusable(false);
 
         imageList = new ArrayList<>();
-        imageList.add(new ImageItem("Ảnh 1", "https://i.pinimg.com/564x/7b/55/d3/7b55d36efc468c573da95d90ef5764b9.jpg"));
+        imageList.add(new ImageItem("Ảnh 1", "https://pda01.esales.vn/Vedan_IMG/B2NPPDTH01_B2SM180621.jpg"));
         imageList.add(new ImageItem("Ảnh 2", "https://i.pinimg.com/564x/d2/1f/cc/d21fcc66de988ed964930394a6fa2b26.jpg"));
         imageList.add(new ImageItem("Ảnh 3", "https://i.pinimg.com/564x/7a/58/d9/7a58d9b1d453816941ffb99ad55edf7a.jpg"));
         imageList.add(new ImageItem("Ảnh 4", "https://i.pinimg.com/564x/64/df/3a/64df3aee6ea76d6dd1fea8bbe535988b.jpg"));
